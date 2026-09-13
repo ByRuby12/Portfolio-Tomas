@@ -1,0 +1,1036 @@
+--> https://github.com/ByRuby12/Bibliotech-DAW PROYECTO DE REPOSITORIO DE MUSICA PELICULAS Y VIDEOJUEGOS HECHO CON BackEnd:
+Java PHP
+FrontEnd:
+HTML5 CSS3 Markdown
+Data Base:
+Oracle
+Design:
+Adobe Photoshop
+
+--> https://github.com/ByRuby12/TPV-Hosteleria
+# TPV de hostelería y pedidos por QR
+
+Plataforma web para gestionar un restaurante o bar desde una sola aplicación. El cliente pide desde el móvil escaneando el QR de la mesa; el camarero, la cocina y administración trabajan sobre esos pedidos en tiempo real.
+
+## Resumen para cualquier persona
+
+El funcionamiento diario es sencillo:
+
+1. El cliente escanea el QR de una mesa y abre la carta en su móvil.
+2. Añade productos a la cesta, confirma el pedido y ve su estado.
+3. El camarero recibe la comanda y controla su avance.
+4. La cocina prepara los productos y los marca como listos.
+5. El camarero entrega el pedido y, cuando el cliente solicita pagar, cobra la mesa.
+6. Administración consulta las ventas, controla la caja y mantiene actualizado el restaurante.
+
+Toda la información se sincroniza para que cada perfil vea los cambios sin tener que actualizar manualmente la pantalla.
+
+## Perfiles de uso
+
+### Cliente
+
+- Accede a la carta mediante el QR de la mesa.
+- Consulta categorías, precios, descripciones, imágenes y alérgenos.
+- Añade productos, cantidades, notas y opciones al carrito.
+- Envía una o varias comandas durante la sesión.
+- Consulta el estado de cada pedido.
+- Revisa la cuenta de la mesa y solicita el cobro.
+- Puede dividir la cuenta por personas y elegir efectivo o tarjeta como preferencia.
+
+### Camarero / TPV
+
+- Ve las mesas activas y libres.
+- Recibe las comandas nuevas en tiempo real.
+- Organiza los pedidos en `Nuevos`, `En preparación`, `Listos` y `Pendiente de pago`.
+- Avanza cada comanda hasta cocina, lista y entrega.
+- Rechaza únicamente el producto que no esté disponible, indicando el motivo.
+- Mantiene activos los demás productos de la misma comanda.
+- Cobra la mesa y registra efectivo, tarjeta o una combinación de ambos.
+- Puede repartir un pago, por ejemplo, entre tres personas en efectivo y dos con tarjeta.
+
+### Cocina
+
+- Ve las comandas pendientes de preparar.
+- Pasa los pedidos a preparación.
+- Marca una comanda como lista para que el camarero la entregue.
+- Puede rechazar una línea concreta si falta el producto o un ingrediente.
+
+### Administración
+
+- Gestiona productos, categorías, precios, stock e imágenes.
+- Gestiona mesas, usuarios y permisos.
+- Consulta el historial de pagos.
+- Controla la caja diaria, apertura, cierre y movimientos manuales.
+- Consulta estadísticas de ventas por periodo.
+- Separa las ventas de efectivo y tarjeta, incluidos los pagos mixtos.
+- Exporta información operativa y datos del restaurante.
+
+## Flujo de una comanda
+
+Una comanda normal sigue este recorrido:
+
+```text
+PENDING -> PREPARING -> READY -> DELIVERED -> PAID
+```
+
+- `PENDING`: el pedido acaba de entrar.
+- `PREPARING`: cocina está trabajando en él.
+- `READY`: está preparado para entregar.
+- `DELIVERED`: el camarero lo ha entregado y queda pendiente de cobro.
+- `PAID`: el pago está confirmado.
+- `CANCELLED`: todas las líneas fueron rechazadas o la comanda se canceló.
+
+Cuando el cliente solicita pagar, la comanda entregada aparece en `Pendiente de pago`. Allí el camarero puede abrir la cuenta, revisar los artículos y confirmar el cobro.
+
+## Productos rechazados
+
+El rechazo se aplica a una línea, no a toda la comanda. Por ejemplo, si una comanda tiene agua, hamburguesa y postre, y no queda postre:
+
+- El postre aparece como rechazado.
+- El postre no se cobra.
+- El agua y la hamburguesa continúan su flujo normal.
+- La comanda solo se cierra automáticamente si todas sus líneas están rechazadas.
+
+Los productos rechazados siguen visibles en la cuenta y en el histórico para dejar claro qué ocurrió.
+
+## Pagos y caja
+
+El sistema admite tres situaciones:
+
+- Pago completo en efectivo.
+- Pago completo con tarjeta.
+- Pago mixto, con personas e importes separados por método.
+
+En un pago mixto se guardan las personas y el importe de cada método. Administración usa esos importes para calcular correctamente:
+
+- Ventas en efectivo.
+- Ventas con tarjeta.
+- Total de ventas.
+- Dinero esperado en la caja física.
+- Diferencias al cerrar la caja.
+
+La tarjeta no se suma al efectivo físico. Los movimientos manuales de caja, como entradas, retiradas o gastos, se registran por separado.
+
+## Arquitectura técnica
+
+La aplicación está construida con:
+
+- Vue 3 para la interfaz.
+- TypeScript para tipos y contratos del dominio.
+- Vite para desarrollo y compilación.
+- Vue Router para las rutas y perfiles.
+- Firebase Authentication para las sesiones de usuarios.
+- Cloud Firestore para pedidos, mesas, productos, pagos, caja y configuración.
+- Firebase Storage o URLs configuradas para recursos visuales.
+- jsPDF y html2canvas para facturas e informes descargables.
+- Chart.js para las estadísticas del administrador.
+
+La lógica se divide en varias capas:
+
+- `src/views`: pantallas completas de cliente, TPV, cocina y administración.
+- `src/components`: componentes reutilizables de interfaz.
+- `src/stores`: estado compartido de autenticación, mesas, sesiones, pedidos y configuración.
+- `src/services`: acceso a Firestore y reglas de negocio de pedidos, mesas, usuarios y productos.
+- `src/utils`: cálculos de totales, stock, estados, facturas y exportaciones.
+- `src/types`: tipos comunes de la aplicación.
+- `src/router`: rutas y protección de acceso por perfil.
+
+Los pedidos se escuchan con sincronización en tiempo real. Cuando un cliente crea un pedido o un trabajador cambia su estado, las pantallas conectadas reciben el cambio mediante Firestore.
+
+## Requisitos
+
+- Node.js 18 o superior.
+- npm.
+- Proyecto Firebase con Authentication y Cloud Firestore.
+
+## Instalación
+
+Desde esta carpeta:
+
+```bash
+npm install
+```
+
+## Desarrollo
+
+Inicia el servidor local:
+
+```bash
+npm run dev
+```
+
+Vite mostrará la dirección local disponible en la terminal.
+
+## Compilación
+
+Comprueba tipos y genera la versión de producción:
+
+```bash
+npm run build
+```
+
+Para servir localmente el resultado compilado:
+
+```bash
+npm run preview
+```
+
+## Configuración de Firebase
+
+La aplicación web necesita las credenciales públicas de la aplicación web de Firebase. Se configuran mediante variables `VITE_` o el archivo de configuración que utilice el proyecto.
+
+Ejemplo de variables:
+
+```env
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+```
+
+No se debe incluir una clave privada ni un JSON de service account en el frontend. Las credenciales de administrador solo deben utilizarse en scripts de backend o tareas administrativas protegidas.
+
+La configuración de colecciones, índices y reglas se explica en [FIREBASE.md](FIREBASE.md).
+
+## Colecciones principales de Firestore
+
+- `users`: usuarios y roles.
+- `tables`: mesas, sesiones activas y solicitudes de pago.
+- `orders`: comandas, líneas, estados, rechazos y totales.
+- `payments`: cobros confirmados y desglose por método.
+- `cashRegisters`: caja abierta.
+- `cashClosures`: cierres históricos.
+- `cashMovements`: entradas y salidas manuales.
+- `products`: catálogo, stock y disponibilidad.
+- `categories`: categorías del menú.
+- `settings`: configuración del restaurante.
+
+## Seguridad y operación
+
+El acceso a las funciones se controla por rol. Las reglas de Firestore limitan qué puede leer o modificar cada tipo de usuario. Antes de publicar una instalación real se deben revisar las reglas, configurar correctamente Firebase Authentication y proteger cualquier credencial privada.
+
+Los datos operativos deben vivir en Firebase cuando la aplicación se ejecuta en producción. Los datos locales solo sirven para estados temporales de interfaz y preferencias del dispositivo.
+
+## Documentación relacionada
+
+- [FIREBASE.md](FIREBASE.md): configuración de Firebase, Firestore y despliegue.
+- [seed-firestore.md](seed-firestore.md): referencia histórica de carga inicial de datos.
+
+ENLANCE PARA VERLO: https://byruby12.github.io/TPV-Hosteleria/Version-3-TPV/#/login ES LA PARTE ADMINISTRATIVA, LA CLIENTE SERIA: https://byruby12.github.io/TPV-Hosteleria/Version-3-TPV/#/mesa/mesa-001?from=admin
+
+--> https://github.com/ByRuby12/CartaWebVersiones
+Sitio Web para Bar – Plantilla Interactiva
+Este repositorio contiene una plantilla web para bares o cafeterías, disponible en tres versiones distintas, pensadas como ejemplos de prueba para adaptar a distintos niveles de funcionalidad: desde una carta digital básica hasta una versión con alérgenos y redes sociales integradas.
+
+🔗 Ejemplos en línea
+💻 Versión 1 - Básica:
+https://byruby12.github.io/CartaWebVersiones/Version-1-Basica
+
+🌐 Versión 2 - Profesional:
+https://byruby12.github.io/CartaWebVersiones/Version-2-Profesional
+
+Todas las versiones están organizadas en carpetas separadas dentro del repositorio.
+
+📌 Resumen rápido de versiones
+Versión 1 - Básica
+
+Carta digital simple y funcional
+Navegación por categorías
+Diseño responsivo
+Datos cargados desde JSON
+Ideal para una carta rápida y fácil de personalizar
+Versión 2 - Profesional
+
+Cabecera más avanzada y diseño pulido
+Botón de idioma con icono de globo
+Menú de productos mejorado
+Sección de contacto y footer completos
+Mejor experiencia visual en desktop y móvil
+🚀 Características comunes
+Carta digital organizada por categorías (desayunos, raciones, hamburguesas, bebidas, postres, etc.).
+Interfaz adaptable a dispositivos móviles (diseño responsivo).
+Carga dinámica de datos desde un archivo JSON (nombre del bar, dirección, imágenes).
+Estilo visual limpio y personalizable.
+📁 Estructura base del proyecto
+index.html: Página principal.
+estilos/style.css: Estilos personalizados.
+funciones/script.js: Código JavaScript para cargar la carta dinámicamente.
+datos/info-bar.json: Archivo con los datos del bar.
+imagenes/: Carpeta con recursos visuales (logo, banner, etc.).
+📦 Versiones disponibles
+Versión base (plantilla mínima)
+Carta digital básica con navegación por categorías y diseño responsivo.
+
+Versión con redes sociales
+Incluye enlaces a perfiles de redes sociales del bar.
+
+Versión con alérgenos
+Muestra iconos o etiquetas con información sobre alérgenos por producto.
+
+🛠️ Instalación y uso
+Descarga o clona el repositorio.
+Explora las carpetas con las distintas versiones.
+Abre index.html desde cualquiera de ellas en tu navegador.
+Personaliza los archivos JSON y las imágenes según las necesidades de tu bar.
+🎨 Personalización
+Edita info-bar.json para cambiar el nombre, dirección, logo o banner.
+Sustituye las imágenes del bar en la carpeta imagenes/.
+Ajusta colores, tipografías o distribución desde style.css.
+👤 Autor
+Plantilla desarrollada por ByRuby12
+
+🤝 Contribuciones
+¡Las sugerencias y mejoras son bienvenidas! Puedes abrir un issue o enviar un pull request.
+
+📄 Licencia
+Creado por ByRuby12 © 2025 – Uso libre para proyectos personales o comerciales con atribución.
+
+-->https://github.com/ByRuby12/LeidersRPWeb
+🚨 LEIDERSRP | SITIO WEB OFICIAL 🌐
+Bienvenido a la plataforma oficial de LeidersRP
+LeidersRP es una comunidad de Roleplay en consola (PS4 y PS5) activa desde 2020, pionera en ofrecer una experiencia de rol estructurada, seria y adaptada completamente a jugadores de consola en GTA V.
+
+Este sitio web representa el siguiente paso en la evolución del servidor.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 ¿QUÉ ES ESTA WEB?
+La web oficial de LeidersRP está diseñada para centralizar toda la información, sistemas y accesos del servidor en un único lugar.
+
+🔹 Aquí podrás encontrar:
+Información actualizada del servidor
+Normativas completas
+Sistemas explicados al detalle
+Acceso a la comunidad de Discord
+Novedades y anuncios oficiales
+Eventos y contenido exclusivo
+━━━━━━━━━━━━━━━━━━━━━━
+
+⚙️ FUNCIONALIDADES PRINCIPALES
+🌐 Plataforma optimizada y accesible
+📜 Normativas claras y organizadas
+🔔 Actualizaciones constantes
+🎮 Integración con la comunidad
+📢 Comunicación directa con los jugadores
+━━━━━━━━━━━━━━━━━━━━━━
+
+🧠 FILOSOFÍA LEIDERSRP
+LeidersRP no es solo un servidor, es una comunidad con bases sólidas:
+
+Profesionalidad
+Compromiso
+Evolución constante
+Calidad de roleplay
+Aquí el rol no es opcional. Es la base de todo.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+🔐 USO Y PROPIEDAD
+Este sitio web es de uso exclusivo para la comunidad de LeidersRP.
+
+Queda prohibida su copia, distribución o uso sin autorización expresa.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+© COPYRIGHT
+© 2020 - 2026 LeidersRP. Todos los derechos reservados.
+Este proyecto, su contenido, sistemas, diseño y marca pertenecen exclusivamente a LeidersRP.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+🔗 ACCESO OFICIAL
+👉 Discord: [https://discord.gg/pQsV3UsHEx]
+👉 Web: [https://byruby12.github.io/LeidersRPWeb]
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 LEIDERSRP
+No es solo un servidor
+Es una experiencia de roleplay en consola
+
+-->https://github.com/ByRuby12/LeidersRP
+LeidersRP
+¡Bienvenido a LeidersRP, el servidor de roleplay de consola número 1 en Europa!
+
+En LeidersRP, encontrarás una experiencia de juego de rol incomparable, llena de aventuras, interacciones y momentos emocionantes. Nuestra plataforma ofrece una amplia gama de funciones y características diseñadas para sumergirte por completo en el mundo del roleplay.
+
+¿Qué encontrarás en LeidersRP?
+CNP Roleplay Consola: Accede a la consola PDA para realizar una variedad de funciones útiles y gestionar tus actividades en el juego (Solo acceso para la Policia).
+
+CNP Roleplay Consola
+EMS Roleplay Consola: Accede a la consola PDA para realizar una variedad de funciones útiles y gestionar tus actividades como personal médico en el juego (Solo acceso para los EMS).
+
+EMS Roleplay Consola
+DNI Roleplay Consola: Utiliza la consola de DNI para gestionar tu identidad en el juego y acceder a información importante (Acceso a todo el mundo).
+
+DNI Roleplay Consola
+USER Roleplay Consola: Accede a la consola de usuario para gestionar tu perfil y datos personales en el juego (Acceso a todo el mundo).
+
+USER Roleplay Consola
+Redes Sociales del Creador de esta Plataforma:
+🔴│ YOUTUBE (CANAL PRINCIPAL)
+🔴│ YOUTUBE (CANAL SECUNDARIO)
+🟠│ INSTAGRAM
+🔵│ TWITTER
+🟣│ TWITCH
+⚪│ DISCORD
+🔴│ TIKTOK
+🟤│ PÁGINA WEB
+⚫│ GITHUB
+💰│ PAYPAL
+
+Soporte y Ayuda
+Si necesitas ayuda o tienes alguna pregunta, no dudes en contactar con la administración del servidor a través de nuestro servidor de Discord: Servidor de Discord
+
+¡Únete a LeidersRP y comienza tu emocionante viaje en el mundo del roleplay!
+
+¡Que te diviertas en LeidersRP! 🎮✨
+
+--> https://github.com/ByRuby12/StockageTienda
+WEB DE STOCKAGE DE TIENDA, https://byruby12.github.io/StockageTienda/
+
+--> https://github.com/ByRuby12/AyuntMadrid
+Documentación del Bot de Telegram para el Ayuntamiento de Madrid
+Este bot ha sido realizado por ByRuby12 (Tomas Cano) durante las prácticas de Grado Superior de Desarrollo de Aplicaciones Web (DAW) en el Ayuntamiento de Madrid, distrito San Blas (IAM).
+
+Introducción
+Este bot de Telegram está diseñado para facilitar la comunicación entre los ciudadanos y el Ayuntamiento de Madrid. Permite a los usuarios enviar reportes de problemas o solicitudes de mejora, que son clasificados automáticamente y enviados tanto a un grupo de Telegram como a la plataforma del Ayuntamiento.
+
+Características principales
+Multilingüe: responde en español, inglés, francés, alemán, chino o portugués según la preferencia del usuario. El usuario puede cambiar el idioma en cualquier momento enviando el nombre del idioma (por ejemplo, "español", "inglés", etc.). El bot detecta automáticamente el idioma por palabras clave, saludos o, en su defecto, por detección automática, y adapta todos los mensajes a ese idioma, incluyendo los mensajes de ayuda y bienvenida.
+Clasificación automática: utiliza OpenAI para clasificar los mensajes o fotos enviados al inicio de la conversación como "aviso" (incidencia) o "petición" (solicitud de mejora), y asigna la categoría y subcategoría correspondiente según los diccionarios oficiales del Ayuntamiento. Si el mensaje o la foto no pueden ser clasificados (por ejemplo, si el contenido es irrelevante, ambiguo o no reconocible), el bot responde automáticamente con un mensaje de ayuda multilingüe, informando al usuario de los idiomas soportados y cómo interactuar correctamente.
+Conversación guiada: el usuario puede iniciar la conversación enviando un mensaje escrito o directamente una foto del problema. El bot guía al usuario paso a paso para enviar la ubicación y, si es necesario, una descripción adicional. Si la foto o el mensaje inicial no pueden ser clasificados, el bot solicita información adicional (nueva foto o descripción) en el idioma del usuario. Si tampoco puede clasificar la descripción, responde con el mensaje de ayuda multilingüe.
+Mensajes personalizados: todos los mensajes del flujo (confirmación, solicitud de ubicación, solicitud de foto, seguimiento, errores, etc.) se muestran en el idioma seleccionado por el usuario. El sistema de mensajes es modular y configurable desde los diccionarios del bot, facilitando la extensión a nuevos idiomas o mensajes personalizados.
+Envío a la plataforma municipal: los reportes se envían tanto a un grupo de Telegram como a la plataforma oficial del Ayuntamiento de Madrid.
+Manejo de errores: mensajes claros si el reporte no se puede clasificar, si la ubicación está fuera de Madrid, o si hay errores en el envío. El flujo de ayuda y fallback está centralizado para garantizar respuestas útiles y coherentes en todos los idiomas soportados.
+Ejemplo de flujo de usuario
+El usuario inicia la conversación y puede cambiar el idioma enviando el nombre del idioma.
+El usuario describe un problema, hace una petición o envía directamente una foto del incidente.
+El bot clasifica el mensaje o la foto y responde en el idioma seleccionado, indicando el tipo, categoría y subcategoría detectados. Si el contenido no puede ser clasificado, el bot responde con un mensaje de ayuda multilingüe adaptado al idioma detectado o preferido, o solicita información adicional (nueva foto o descripción).
+El bot solicita la ubicación del incidente.
+Si el usuario no ha enviado foto al inicio, el bot ofrece la opción de enviar una foto o continuar sin archivo. Si la foto no es clasificable, solicita otra foto o una descripción adicional. Si la descripción tampoco es clasificable, el bot responde con el mensaje de ayuda multilingüe.
+El bot envía el reporte al grupo de Telegram y a la plataforma municipal, mostrando un mensaje de seguimiento y confirmación en el idioma del usuario.
+Ejemplo de conversación
+A continuación se muestra un ejemplo de interacción con el bot en español y en inglés:
+
+Usuario: Hola, hay una farola rota en mi calle
+
+Bot: ✅ He detectado un aviso en la categoría 'Alumbrado Público' y subcategoría 'Farola Apagada'. Por favor, envíame la ubicación del incidente:
+
+Usuario: (envía ubicación)
+
+Bot: 📸 Si quieres, ahora puedes enviar una foto o video del problema. Esto puede ayudar a los equipos del Ayuntamiento. O pulsa 'Omitir' para continuar sin archivo.
+
+Usuario: (envía foto o pulsa Omitir)
+
+Bot: 📋 Reporte Seguimiento: 123456789 👤 Usuario: Nombre Apellido 📌 Tipo: Aviso 📂 Categoría: Alumbrado Público 🔖 Subcategoría: Farola Apagada 🗺️ Dirección: 40.4168 -3.7038 💬 Descripción: Hola, hay una farola rota en mi calle ✅ Tu reporte ha sido enviado correctamente a la Plataforma del Ayuntamiento de Madrid
+
+Usuario: english
+
+Bot: 👋 Hi! I am the official bot of Madrid City Council. I'm here to help you report any issue or suggestion about the city🏛️ ... (resto del mensaje de bienvenida en inglés)
+
+Usuario: There is a lot of trash in the park
+
+Bot: ✅ I have detected a aviso in category 'Limpieza Viaria' and subcategory 'Basura Acumulada.' Please send me the location of the incident:
+
+Usuario: (sends location)
+
+Bot: 📸 If you want, you can now send a photo or video of the issue. This can help the City Council teams. Or press 'Skip' to continue without a file.
+
+Usuario: (sends photo or presses Skip)
+
+Bot: 📋 Report Follow-up: 987654321 👤 User: John Doe 📌 Type: Aviso 📂 Category: Limpieza Viaria 🔖 Subcategory: Basura Acumulada 🗺️ Address: 40.4168 -3.7038 💬 Description: There is a lot of trash in the park ✅ Your report has been successfully sent to the Madrid City Council platform
+
+⚠️ Nota: La descripción que se envía a la plataforma del Ayuntamiento es siempre el texto original del usuario, en el idioma en que lo escribió. La traducción automática al español solo se utiliza para mostrar el mensaje de seguimiento y en consola, garantizando que el Ayuntamiento reciba el reporte tal cual lo escribió el ciudadano.
+
+El bot adapta todos los mensajes a cualquiera de los idiomas soportados según la preferencia del usuario.
+
+Diccionarios y clasificación
+El bot utiliza diccionarios oficiales (AVISOS_PRUEBA y PETICIONES_PRUEBA) para validar categorías y subcategorías. La clasificación se realiza mediante la API de OpenAI, que responde siempre en español para garantizar la correspondencia exacta con los diccionarios.
+
+Multilingüismo y cambio de idioma
+El idioma de la conversación se puede cambiar en cualquier momento enviando el nombre del idioma (por ejemplo, "francés").
+El idioma seleccionado se mantiene durante toda la conversación, y todos los mensajes del bot se adaptan automáticamente.
+Idiomas soportados: español, inglés, francés, alemán, chino, portugués.
+Estructura del Código
+El código está dividido en varias secciones principales:
+
+Importación de Librerías y Configuración Inicial
+Definición de Estados y Mensajes del Bot
+Funciones Principales
+Configuración del Manejador de Conversación
+Ejecución del Bot
+1. Importación de Librerías y Configuración Inicial
+Se importan las librerías necesarias, incluyendo telegram y telegram.ext para la interacción con la API de Telegram, y otras librerías como datetime y json para el manejo de datos. También se configuran las claves necesarias para la API de Telegram y OpenAI.
+
+from telegram import (Update, KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove, Location)
+from telegram.ext import (ApplicationBuilder, MessageHandler, filters, ContextTypes, ConversationHandler)
+from datetime import datetime
+import json
+import os
+Se definen variables globales como TELEGRAM_GROUP_ID para el ID del grupo de Telegram y las etapas de la conversación (ESPERANDO_UBICACION, ESPERANDO_MEDIA).
+
+2. Definición de Estados y Mensajes del Bot
+El bot utiliza un manejador de conversación (ConversationHandler) para gestionar los diferentes estados de interacción con el usuario:
+
+ESPERANDO_UBICACION: El bot espera que el usuario envíe su ubicación.
+ESPERANDO_MEDIA: El bot espera que el usuario envíe una foto, video o elija omitir.
+3. Funciones Principales
+3.1 analizar_mensaje_con_openai
+Esta función utiliza la API de OpenAI para analizar el mensaje del usuario y clasificarlo como un "aviso" o "petición". También identifica la categoría y subcategoría del reporte.
+
+Entrada: Mensaje del usuario.
+Salida: Un diccionario con el tipo, categoría y subcategoría, o None si no se puede clasificar.
+3.2 manejar_mensaje
+Recibe el mensaje inicial del usuario, lo analiza con analizar_mensaje_con_openai y solicita la ubicación si el mensaje es válido.
+
+Entrada: Mensaje del usuario.
+Salida: Solicitud de ubicación o mensaje de error.
+3.3 recibir_ubicacion
+Recibe la ubicación del usuario, completa los datos del reporte y solicita una foto, video o la opción de omitir.
+
+Entrada: Ubicación del usuario.
+Salida: Solicitud de foto, video o confirmación de omisión.
+3.4 recibir_media
+Recibe la foto, video o la decisión de omitir del usuario. Luego, envía el reporte al grupo de Telegram y a la plataforma del Ayuntamiento.
+
+Entrada: Foto, video o texto del usuario.
+Salida: Confirmación de envío del reporte. Si la foto o vídeo no pueden ser clasificados, el bot solicita otra foto o una descripción adicional. Si la descripción tampoco es válida, responde con el mensaje de ayuda multilingüe, asegurando que el usuario siempre reciba una respuesta útil y clara en su idioma.
+4. Configuración del Manejador de Conversación
+El manejador de conversación define los puntos de entrada, estados y salidas de la interacción con el bot.
+
+conversation_handler = ConversationHandler(
+    entry_points=[MessageHandler(filters.TEXT & ~filters.COMMAND, manejar_mensaje)],
+    states={
+        ESPERANDO_UBICACION: [MessageHandler(filters.LOCATION, recibir_ubicacion)],
+        ESPERANDO_MEDIA: [
+            MessageHandler(filters.PHOTO | filters.VIDEO | filters.TEXT, recibir_media)
+        ]
+    },
+    fallbacks=[],
+)
+5. Ejecución del Bot
+El bot se inicia utilizando ApplicationBuilder y se configura para ejecutar el manejador de conversación.
+
+if __name__ == '__main__':
+    app = ApplicationBuilder().token(CURAIME_BOT_KEY).build()
+    app.add_handler(conversation_handler)
+    print("🤖 Bot en funcionamiento...")
+    app.run_polling()
+    print("🚫 Bot detenido.")
+Flujo de Trabajo
+Inicio: El usuario envía un mensaje describiendo un problema, una petición o directamente una foto del incidente.
+Clasificación: El mensaje o la foto se analiza y clasifica como "aviso" o "petición". Si no es clasificable, el bot responde con un mensaje de ayuda multilingüe o solicita información adicional (nueva foto o descripción).
+Ubicación: El bot solicita la ubicación del incidente.
+Media: Si el usuario no ha enviado foto/vídeo al inicio, el bot solicita una foto, vídeo o permite omitir. Si la foto no es clasificable, solicita otra foto o una descripción adicional. Si tampoco puede clasificar la descripción, responde con el mensaje de ayuda.
+Envío: El reporte se envía al grupo de Telegram y a la plataforma del Ayuntamiento.
+Detalles Técnicos
+Envío a la Plataforma del Ayuntamiento
+El reporte se envía a la plataforma del Ayuntamiento mediante una solicitud HTTP POST. El payload incluye información como:
+
+Descripción del problema (texto original del usuario, sin traducir).
+Coordenadas de ubicación.
+Categoría y subcategoría del reporte.
+payload = {
+    "service_id": "591b36544e4ea839018b4653",
+    "description": datos["descripcion"],  # Texto original del usuario
+    "position": {
+       "lat": datos["latitud"],
+       "lng": datos["longitud"],
+        "location_additional_data": [
+            {"question": "5e49c26b6d4af6ac018b4623", "value": "Avenida"},
+            ...
+        ]
+    },
+    "address_string": "Calle Mayor, 12",
+    "device_type": "5922cfab4e4ea823178b4568",
+    "additionalData": [
+        {"question": "5e49c26b6d4af6ac018b45d2", "value": "Malos olores"}
+    ]
+}
+La traducción automática al español solo se utiliza para el mensaje de seguimiento y para mostrar en consola, nunca para el POST al Ayuntamiento.
+
+Manejo de Errores
+El bot incluye manejo de errores para:
+
+Fallos en la clasificación del mensaje.
+Errores al enviar el reporte a la plataforma del Ayuntamiento.
+Pruebas unitarias
+El archivo test_demo.py incluye pruebas unitarias para la función de clasificación y el flujo principal del bot. Las pruebas cubren tanto mensajes válidos como irrelevantes, así como el flujo multilingüe y el manejo de fotos no clasificables, validando que el bot responde siempre con el mensaje de ayuda adecuado cuando corresponde. Puedes ejecutarlas con:
+
+python -m unittest test_demo.py
+Dependencias
+python-telegram-bot
+openai
+requests
+asyncio
+nest_asyncio
+Notas de seguridad
+Las claves de API deben mantenerse en el archivo claves.py y nunca subirse a repositorios públicos.
+Autor
+Bot realizado por ByRuby12 (Tomas Cano) durante las prácticas de Grado Superior de Desarrollo de Aplicaciones Web (DAW) en el Ayuntamiento de Madrid, distrito San Blas (IAM).
+
+--> https://github.com/ByRuby12/CremEsports
+🌐 Mi Primera Página Web – Proyecto Inicial
+Este proyecto representa uno de los momentos más importantes en mi camino como desarrollador web: ¡mi primera página web! ✨
+Fue realizada cuando apenas comenzaba a aprender sobre desarrollo web, con conocimientos básicos de HTML y un gran entusiasmo por el diseño, la estructura visual y la experiencia de usuario.
+
+🧩 Estructura del proyecto
+El sitio está dividido en múltiples archivos HTML que componen diferentes secciones o partes:
+
+🟦 Parte 1: Bienvenida
+Pantalla de entrada al sitio, que introduce al usuario de forma atractiva.
+
+🟨 Parte 2: Registro
+Formulario básico para crear una cuenta o iniciar sesión.
+
+🟥 Parte 3: Menús temáticos
+Distintas secciones como:
+
+Accesorios
+Colaboraciones
+Equipo de competición
+Gaming
+Merchandising
+Información general
+Cada una con su versión estándar y una versión “SR”.
+🟩 Parte 4: Objetos y productos
+Páginas individuales para mostrar productos como:
+
+Mochilas, tazas, carteras
+Ratones, teclados, cascos
+Camisetas, sudaderas, calzado
+🛒 Parte 5: Comprar producto
+Simulación de proceso de compra para cada artículo.
+
+✅ Parte 6: Finalizar compra
+Sección de resumen de pedido y cierre de compra.
+
+🎨 Enfoque de diseño
+Aunque los conocimientos técnicos en ese momento eran limitados, puse mucho empeño en la estética, distribución de contenido y experiencia de navegación.
+
+Diseño modular por secciones
+Navegación clara y sencilla
+Colores llamativos y visuales diferenciadas
+Enfoque en usabilidad y producto
+🚀 Lo que aprendí
+Fundamentos de HTML y estructura web
+Organización de carpetas y archivos en un proyecto
+Desarrollo por etapas
+Diseño visual atractivo sin frameworks
+Constancia, pasión y creatividad
+🔗 Acceso al Proyecto
+Puedes acceder a la web desde el siguiente enlace:
+
+👉 ACCEDER AHORA
+
+✉️ Contacto
+¿Quieres ver cómo ha evolucionado mi trabajo desde este primer proyecto?
+
+📧 byruby12.contacto@gmail.com
+🌐 https://comunidad-byruby12.jimdosite.com
+📺 https://www.youtube.com/@ByRuby12
+🐦 https://twitter.com/byruby12
+
+Gracias por visitar el comienzo de mi viaje en el mundo web 🌱
+--> https://github.com/ByRuby12/VideoJuegos-Processing 
+🕹️ Mini-Juegos – ByRuby12
+Este repositorio contiene una recopilación de mini-juegos desarrollados utilizando el entorno de programación Processing. Son proyectos independientes de los trabajos del ciclo DAW, creados como parte de mis prácticas personales de programación creativa e interacción visual.
+
+Processing es una herramienta fantástica para explorar gráficos, animaciones y lógica de juegos, y estos juegos reflejan tanto mi aprendizaje como mi pasión por crear experiencias interactivas simples y entretenidas.
+
+🎮 Lista de Mini-Juegos
+Aquí tienes los juegos incluidos en este repositorio, cada uno con su propio código fuente en Processing (Java) y su carpeta correspondiente:
+
+🔳 3 En Ralla
+Versión digital del clásico juego de estrategia para dos jugadores.
+
+🐦 Flappy Bird
+Adaptación del famoso juego de habilidad, con mecánica de salto y obstáculos.
+
+💠 Juego De La Vida
+Implementación del autómata celular de Conway. Generación de patrones vivos y evolución en tiempo real.
+
+👻 PacMan
+Recreación del legendario arcade donde el jugador recoge puntos mientras evita fantasmas.
+
+🏓 PongGame
+Simulación del clásico juego de tenis de dos jugadores. Incluye física básica de rebote.
+
+🐍 SnakeGame
+Juego en el que controlas una serpiente que crece al comer, evitando chocar contra sí misma.
+
+🧱 Tetris
+Versión jugable del icónico juego de bloques, con rotaciones, caída automática y líneas eliminables.
+
+📁 Estructura del proyecto
+Cada carpeta contiene:
+
+Archivos .pde de Processing
+Recursos (si aplica): imágenes, sonidos, fuentes
+Breve descripción del juego (comentada en el código)
+Puede incluir: instrucciones de uso o controles básicos
+🛠️ Requisitos
+Para ejecutar los juegos necesitas:
+
+✅ Tener Processing instalado (versión recomendada: 3.x o superior)
+Abrir cada carpeta como proyecto independiente desde el IDE de Processing
+Pulsar ▶️ (Run) para comenzar el juego
+🎯 Objetivo del repositorio
+Practicar lógica de programación y estructuras básicas
+Mejorar mis habilidades en diseño visual y dinámicas de juego
+Compartir mis creaciones con otras personas interesadas en el desarrollo de juegos
+✉️ Contacto
+¿Te interesa alguno de estos juegos o quieres crear uno conmigo?
+
+📧 byruby12.contacto@gmail.com
+🌐 https://comunidad-byruby12.jimdosite.com
+📺 https://www.youtube.com/@ByRuby12
+🐦 https://twitter.com/byruby12
+
+Gracias por jugar y disfrutar de mis mini-juegos hechos con cariño en Processing ❤️
+
+--> https://github.com/ByRuby12/Videojuegos-HTML
+
+🧩 Mini-Juegos HTML – ByRuby12
+Este repositorio contiene una colección de mini-juegos desarrollados con tecnologías web: HTML, CSS y JavaScript. A diferencia de los mini-juegos creados con Processing, estos están diseñados para ejecutarse directamente desde el navegador, sin necesidad de entornos adicionales.
+
+Cada juego representa una práctica de lógica, interacción visual o diseño web interactivo. Están hechos con cariño y dedicación, reflejando tanto mis ganas de experimentar como de aprender creando.
+
+🎮 Lista de Mini-Juegos
+Cada juego está disponible para jugar online desde el navegador en el siguiente enlace:
+
+💣 Busca Minas
+Versión web del clásico Buscaminas, con lógica de detección de bombas y casillas.
+
+🎨 Coloron-game
+Juego de colores con mecánica visual y reacción rápida.
+
+🧠 Copycat
+Juego de memoria que desafía al jugador a repetir secuencias de colores o sonidos.
+
+🦖 Dinosaurio
+Inspirado en el juego offline de Google Chrome, esquiva obstáculos con un pequeño dino.
+
+👹 Fearsome
+Juego con estética oscura, posiblemente de reacción o evasión de enemigos.
+
+🐤 Flappy-Dino
+Versión de Flappy Bird con un dinosaurio como protagonista, usando colisiones y gravedad.
+
+👻 Pacman
+Recreación HTML del arcade clásico, con sistema de laberinto y enemigos.
+
+🏓 PinPong
+Juego de ping pong para uno o dos jugadores. Física simple y controles por teclado.
+
+🧱 Tetris
+Implementación del clásico de bloques, jugable con controles de rotación y caída.
+
+🗼 Tower-blocks
+Juego de apilar bloques con precisión, con física basada en timing.
+
+🌀 p0rtal
+Juego inspirado en la mecánica de portales, puzzles visuales y teletransportación.
+
+📁 Estructura del Proyecto
+Cada carpeta incluye:
+
+index.html – Página principal del juego
+style.css – Estilos visuales
+script.js – Lógica del juego
+/assets (opcional) – Imágenes, sonidos o recursos del juego
+Puedes abrir cada juego localmente desde un navegador o jugarlo directamente en línea desde los enlaces anteriores.
+
+🧠 Lo que aprendí
+Con estos juegos he puesto en práctica conceptos como:
+
+DOM y eventos de teclado o ratón
+Animaciones con JavaScript y CSS
+Detección de colisiones
+Lógica de puntuación y estados de juego
+Diseño visual responsivo
+Control del flujo del juego y estados (inicio, pausa, derrota…)
+🚀 Objetivo del repositorio
+Compartir mis mini-juegos en HTML con otros/as desarrolladores/as
+Seguir aprendiendo mecánicas nuevas de juego
+Mantener una colección de mis proyectos creativos en la web
+✉️ Contacto
+¿Te interesa jugar, ver el código o colaborar en futuros juegos?
+
+📧 byruby12.contacto@gmail.com
+🌐 https://comunidad-byruby12.jimdosite.com
+📺 https://www.youtube.com/@ByRuby12
+🐦 https://twitter.com/byruby12
+
+Gracias por jugar y apoyar este rincón de creatividad web 🎮💻
+--> https://github.com/ByRuby12/PolloLoco
+🐔 El Pollo Loco - Juego Web
+¡Bienvenido al emocionante mundo de El Pollo Loco!
+Este juego web está diseñado para ofrecer diversión, desafíos y muchas risas. Ponte en el rol de un intrépido pollo y prepárate para superar obstáculos locos, castigos inesperados y retos impredecibles, todo dentro de un entorno vibrante y lleno de humor.
+
+🎮 Descripción
+El Pollo Loco es un juego multisección creado con HTML, CSS y JavaScript, donde los jugadores pueden explorar diferentes categorías llenas de minijuegos, pruebas alocadas y elementos sorpresa.
+
+Fue desarrollado como un proyecto personal y de aprendizaje, donde cada línea de código refleja la evolución creativa y técnica del desarrollador. A pesar de su sencillez, el juego destaca por su dinamismo y posibilidades de expansión.
+
+📂 Estructura del Proyecto
+index.html → Página principal del juego.
+styles.css → Estilos del juego con diseño vibrante y llamativo.
+script.js → Código JavaScript que controla la lógica del juego.
+Carpetas por secciones del juego:
+ACCION/
+CASTIGOS/
+EROTICOS/
+EXTRAS/
+MINIJUEGOS/
+PARATI/
+Cada carpeta contiene archivos y dinámicas específicas para ampliar la jugabilidad y darle variedad a la experiencia del jugador.
+
+✨ Características
+✅ Minijuegos variados y con humor
+✅ Categorías temáticas: acción, eróticos, retos, castigos, etc.
+✅ Jugabilidad sencilla e intuitiva
+✅ Diseño colorido y divertido
+✅ Proyecto 100% en navegador, sin instalación
+🚀 Cómo Jugar
+¡No necesitas descargar nada!
+Puedes jugar gratis directamente desde tu navegador:
+
+👉 JUGAR AHORA
+
+Haz clic en el enlace.
+Explora las secciones del juego.
+Sigue las instrucciones en pantalla y ¡diviértete!
+📜 Licencia
+Este juego está publicado bajo la licencia ByRuby12.
+Puedes jugarlo, compartirlo y modificarlo libremente.
+Se agradece cualquier contribución o mejora que desees aportar. ¡El proyecto está abierto para seguir creciendo!
+
+🧠 Créditos
+Desarrollado por un entusiasta de la programación creativa y el diseño interactivo.
+Proyecto realizado con fines didácticos y como parte de un portfolio personal en la rama de DAW (Desarrollo de Aplicaciones Web).
+
+¡Gracias por jugar a El Pollo Loco! 🐔🔥
+
+--> https://github.com/ByRuby12/DAW
+📁 Proyectos DAW – ByRuby12
+¡Bienvenido/a a mi repositorio de proyectos del ciclo formativo de Desarrollo de Aplicaciones Web (DAW)! Aquí encontrarás una recopilación de trabajos realizados durante mi formación, donde he podido aplicar y reforzar conocimientos en distintas tecnologías, lenguajes de programación, frameworks y herramientas del entorno web y multiplataforma.
+
+🚀 Lista de proyectos
+A continuación se presentan los proyectos organizados por nombre, con una breve descripción general y enlace para acceder directamente al sitio:
+
+🔷 Proyecto-AFRAME
+Proyecto desarrollado con A-Frame (WebVR), para la creación de escenas 3D y experiencias inmersivas directamente desde el navegador.
+
+📚 Proyecto-Biblioteca
+Aplicación orientada a la gestión de una biblioteca: libros, autores, usuarios y préstamos. Enfocada en la lógica de backend.
+
+📖 Proyecto-Bibliotech
+Evolución o versión extendida de la anterior con mejoras visuales o funcionalidades adicionales.
+
+🎨 Proyecto-BootStrap
+Sitio web desarrollado utilizando el framework Bootstrap para practicar diseño responsivo y componentes visuales.
+
+🃏 Proyecto-Cartas
+Juego o aplicación interactiva basada en cartas, con funcionalidades dinámicas posiblemente usando JavaScript.
+
+🌐 Proyecto-IOT
+Proyecto relacionado con el Internet de las Cosas, donde se combinan conceptos de sensores, datos en tiempo real y visualización web.
+
+🎮 Proyecto-LeidersRP
+Proyecto personalizado o plataforma para un servidor RolePlay (posiblemente para videojuegos como GTA RP o FiveM).
+
+🧱 Proyecto-MVC
+Implementación del patrón Modelo-Vista-Controlador en una aplicación web, para comprender la separación lógica y estructural.
+
+🐾 Proyecto-Pokemon
+Aplicación temática de Pokémon, con listado de criaturas, detalles, y funcionalidades relacionadas al universo Pokémon.
+
+✍️ Proyecto-ProcesadorTextos
+Simulación o desarrollo de un procesador de textos básico, con edición, guardado y formato.
+
+💨 Proyecto-Tailwind
+Prácticas o desarrollos usando TailwindCSS para estilos utilitarios y diseño web moderno.
+
+❓ Proyecto-Trivial
+Juego de preguntas y respuestas tipo trivial, con sistema de puntuación y categorías.
+
+🌍 Proyeto-WebDinamica
+Desarrollo de aplicaciones web dinámicas con interacción backend, posiblemente usando PHP, JavaScript o tecnologías de servidor.
+
+💡 Tecnologías aplicadas
+A lo largo de estos proyectos he trabajado con herramientas y lenguajes como:
+
+HTML5, CSS3, JavaScript
+TailwindCSS, Bootstrap
+PHP, Java
+Python
+SQL y bases de datos relacionales
+Vue.js y frameworks modernos
+A-Frame (WebVR)
+Metodologías como MVC
+Desarrollo de interfaces, lógica backend y proyectos frontend
+📌 Notas
+Estos proyectos reflejan mi evolución como desarrollador web y muestran mi compromiso con el aprendizaje práctico. Si tienes curiosidad por algún proyecto en particular, ¡no dudes en explorarlo!
+
+✉️ Contacto
+Si quieres ponerte en contacto conmigo o colaborar en algún proyecto:
+
+📧 byruby12.contacto@gmail.com
+🌐 https://comunidad-byruby12.jimdosite.com
+📺 https://www.youtube.com/@ByRuby12
+🐦 https://twitter.com/byruby12
+
+Gracias por visitar esta rama de mis proyectos de DAW 🚀
+
+--> https://github.com/ByRuby12/TFG-DAW
+Sportdistrict - Deportistas del Barrio
+Sportdistrict es una plataforma web integral para la gestión, organización y participación en ligas deportivas de barrio. Su objetivo es digitalizar y facilitar la experiencia de jugadores, árbitros y administradores, permitiendo la gestión de equipos, partidos, estadísticas, reportes y mucho más desde cualquier dispositivo.
+
+Tabla de Contenidos
+Descripción General
+Características Principales
+Roles de Usuario
+Estructura de Carpetas
+Guía de Inicio Rápido
+Guía de Usuario
+Tecnologías Utilizadas
+Contribuir
+Licencia
+Descripción General
+Sportdistrict digitaliza la gestión de ligas deportivas amateur, permitiendo a los usuarios:
+
+Crear y gestionar equipos.
+Inscribirse y participar en partidos.
+Consultar estadísticas y clasificaciones.
+Gestionar reportes e incidencias.
+Administrar usuarios, árbitros y estadios.
+La plataforma está compuesta por un backend robusto en NestJS y un frontend moderno en Vue 3, ofreciendo una experiencia fluida y segura.
+
+Características Principales
+Para jugadores
+Registro y autenticación:
+Registro tradicional y mediante Google.
+Confirmación de cuenta por correo electrónico.
+Recuperación de contraseña.
+Gestión de perfil:
+Edición de datos personales y foto de perfil.
+Visualización de estadísticas personales.
+Equipos:
+Crear un equipo propio o unirse a uno existente.
+Gestionar la plantilla si eres capitán.
+Visualizar información y estadísticas del equipo.
+Partidos:
+Consultar calendario, resultados y detalles de partidos.
+Recibir notificaciones sobre próximos encuentros.
+Reportes:
+Enviar reportes sobre incidencias en partidos o problemas con otros usuarios.
+Para árbitros
+Panel de árbitro:
+Visualización de partidos asignados.
+Gestión de incidencias y reportes durante los partidos.
+Acceso a estadísticas de arbitraje.
+Para administradores
+Panel de administración:
+Gestión de usuarios, equipos, partidos, estadios y reportes.
+Visualización y resolución de reportes enviados por los usuarios.
+Asignación de árbitros y gestión de roles.
+Otras funcionalidades
+Gestión de estadios:
+Consulta y visualización de estadios en un mapa interactivo.
+Información detallada de cada estadio.
+Notificaciones y avisos:
+Avisos sobre el estado del perfil, partidos y otras acciones importantes.
+Seguridad:
+Autenticación segura con JWT y cookies.
+Protección de rutas según el rol del usuario.
+Roles de Usuario
+Jugador: Puede crear/gestionar equipos, inscribirse en partidos, consultar estadísticas y enviar reportes.
+Árbitro: Gestiona partidos asignados, reporta incidencias y consulta estadísticas de arbitraje.
+Administrador: Control total sobre la plataforma, gestión de usuarios, equipos, partidos, reportes y estadios.
+Estructura de Carpetas
+backend/: API REST con NestJS. Incluye módulos para:
+Usuarios (registro, login, perfil, roles)
+Equipos (creación, gestión, inscripción)
+Partidos (calendario, resultados, incidencias)
+Árbitros (asignación, gestión de partidos)
+Estadios (gestión y consulta de estadios)
+Reportes (gestión de incidencias y problemas)
+Autenticación (JWT, Google, recuperación de contraseña)
+Lógica de negocio y servicios auxiliares
+Sportdistrict/: Frontend en Vue 3. Incluye:
+Vistas para cada panel de usuario (jugador, árbitro, admin)
+Componentes reutilizables
+Configuración de rutas y estado
+Integración con la API backend
+uploads/: Almacena fotos de perfil y archivos subidos por los usuarios.
+Guía de Inicio Rápido
+Clona el repositorio y accede a la carpeta principal:
+git clone <url-del-repo>
+cd Deportistas_del_barrio
+Instala las dependencias:
+Backend:
+cd backend
+npm install
+Frontend:
+cd ../Sportdistrict
+npm install
+Configura la base de datos:
+Crea una base de datos MySQL/MariaDB y actualiza la configuración en backend/src/app.module.ts.
+Ejecuta el backend:
+npm run start:dev
+Ejecuta el frontend:
+npm run dev
+Accede a la aplicación:
+Abre tu navegador en http://localhost:5173 (o el puerto configurado).
+Guía de Usuario
+Registro y acceso
+Puedes registrarte con tu correo electrónico o con tu cuenta de Google.
+Tras el registro, recibirás un correo de confirmación.
+Si olvidas tu contraseña, puedes recuperarla desde la pantalla de login.
+Gestión de perfil
+Accede a tu perfil desde el menú principal.
+Completa tus datos personales y sube una foto de perfil.
+Si tu perfil no está completo, recibirás un aviso.
+Equipos
+Crea un equipo desde el panel correspondiente o únete a uno existente.
+Si eres capitán, podrás gestionar la plantilla y aceptar/rechazar solicitudes.
+Consulta la información y estadísticas de tu equipo en el panel de equipo.
+Partidos
+Consulta el calendario de partidos y los resultados desde el panel de partidos.
+Recibe notificaciones sobre próximos partidos y cambios de horario.
+Estadísticas
+Accede a estadísticas personales y de equipo desde el panel de estadísticas.
+Consulta clasificaciones, goles, tarjetas y más.
+Reportes
+Envía reportes sobre incidencias en partidos o problemas con otros usuarios.
+Los administradores revisarán y gestionarán los reportes recibidos.
+Panel de árbitro
+Si eres árbitro, accede a tu panel para ver partidos asignados y reportar incidencias.
+Panel de administración
+Si eres administrador, accede al panel para gestionar usuarios, equipos, partidos, estadios y reportes.
+Estadios
+Consulta los estadios disponibles y su ubicación en el mapa.
+Tecnologías Utilizadas
+Frontend: Vue 3, TypeScript, Axios, Tailwind CSS
+Backend: NestJS, TypeORM, MySQL/MariaDB, Passport, JWT
+Autenticación: Local y Google OAuth 2.0
+Otros: Vite, ESLint, Prettier
+Contribuir
+¿Quieres contribuir? ¡Eres bienvenido!
+
+Haz un fork del repositorio.
+Crea una rama para tu funcionalidad o corrección.
+Haz tus cambios y abre un Pull Request.
+Describe claramente tu aporte.
+Licencia
+Este proyecto está bajo la licencia MIT.
+
+Video Presentación
+Video de YouTube
+
+¡Disfruta gestionando tu liga deportiva de barrio con Sportdistrict!
+

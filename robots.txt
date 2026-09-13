@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://byruby12.github.io/Portfolio-Tomas/sitemap.xml

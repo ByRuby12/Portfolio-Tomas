@@ -1,0 +1,21 @@
+.resume-details{margin-bottom:120px}.skills{gap:18%;}.skills-intro{max-width:340px}.skill-group{min-height:96px;align-items:start}.skill-group p{max-width:570px;line-height:1.75}
+
+@media(max-width:520px){
+  .resume-details{display:block;margin-bottom:72px;padding:76px 20px 68px}
+  .resume-detail-intro{margin-bottom:48px}
+  .resume-detail-intro h2{font-size:clamp(44px,12vw,64px);max-width:300px}
+  .resume-detail-grid{display:grid;grid-template-columns:1fr;gap:0}
+  .resume-detail-card,.resume-detail-card:nth-child(even){padding:22px 0;border-left:0;min-height:0}
+  .resume-detail-card .mono{margin-bottom:12px}
+  .resume-detail-card p{font-size:11px;line-height:1.75;max-width:300px}
+  .resume-detail-card strong{font-size:14px;line-height:1.7}
+  .experience{padding-top:0}
+  .experience .section-heading{margin-bottom:56px}
+  .skills{display:block;padding:88px 20px 105px}
+  .skills-intro{max-width:none;margin-bottom:64px}
+  .skills-intro h2{max-width:280px}
+  .skills-list{border-top:1px solid var(--line)}
+  .skill-group{grid-template-columns:34px 1fr;gap:15px;min-height:0;padding:23px 0}
+  .skill-group h3{font-size:12px;line-height:1.35;margin-bottom:11px}
+  .skill-group p{font-size:11px;line-height:1.75;max-width:none}
+}

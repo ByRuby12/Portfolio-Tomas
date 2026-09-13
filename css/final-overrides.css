@@ -1,0 +1,23 @@
+.portrait-caption{display:none!important}
+.hero-logo{display:none!important}
+.noise,body::before{transition:none!important}
+.contact-box::before{display:none!important}
+.contact-box>div:first-child::before{display:none!important}
+
+.contact-box{position:relative}
+.contact-box::before{content:"";display:block;position:absolute;width:82px;height:82px;left:0;top:75px;border:3px solid var(--orange);border-radius:50%;background:url('../assets/logotipo.png') center/cover no-repeat;box-shadow:0 10px 25px rgba(255,128,92,.16)}
+.site-footer::before{content:"";display:inline-block;width:22px;height:22px;border-radius:4px;background:url('../assets/logotipo.png') center/cover no-repeat;vertical-align:middle;margin-right:8px}
+
+@media (max-width: 520px){
+  .hero-art{height:330px!important;overflow:hidden!important}
+  .art-card-back{width:205px;height:275px;top:25px;right:75px}
+  .art-card-main{width:210px;height:285px;top:55px;right:125px}
+  .contact-box{padding-top:145px;text-align:center}
+  .contact-box::before{left:50%;top:44px;transform:translateX(-50%)}
+  .contact-right>p{margin-left:auto;margin-right:auto}
+  .contact-links{justify-content:center}
+  .site-footer::before{margin-right:0}
+}
+
+html,body{scrollbar-width:none;-ms-overflow-style:none}
+html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
