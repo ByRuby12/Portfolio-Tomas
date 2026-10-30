@@ -29,7 +29,7 @@ const projects = {
   'discord-bot': { kicker: '15 / Automatización de comunidad', title: 'Bot completo para Discord', description: 'Bot multifunción para servidores de comunidad con moderación, gestión de usuarios, economía y tickets de soporte.', tech: ['Python', 'Discord API', 'Automatización', 'Moderación'], live: 'https://github.com/ByRuby12/LeidersRP', repo: 'https://github.com/ByRuby12/LeidersRP' },
   'web-ecosystem': { kicker: '16 / Ecosistema web', title: 'Ecosistema de webs', description: 'Proyecto conjunto formado por 17 webs: latiendadelhumor.es, labodegadelhumor.es, sinverguenza.eu, elnacionalista.es, qrgift.es, latiendadelespia.es, llamarlaatencion.es, profesionalesdelbarrio.es, job.profesionalesdelbarrio.es, maketheworldgreatagain.info, latiendadelrobot.es, latiendadelosinventos.es, bossmarket.es, catalogo.bossmarket.es, europalis.eu, hispanol.es y securitymark.es.', tech: ['Websites', 'eCommerce', 'Catálogos', 'SEO', 'Mantenimiento'], live: 'https://latiendadelhumor.es', repo: 'https://github.com/ByRuby12' },
   universalworks: { kicker: '17 / Web multi-negocio', title: 'UniversalWorks', description: 'Plantilla web adaptable para más de 30 tipos de negocio, como talleres mecánicos, carpinterías, electricistas y otros servicios profesionales. Cada negocio puede presentar sus servicios con una presencia online clara y responsive.', tech: ['HTML', 'CSS', 'JavaScript', 'TypeScript', 'Vue.js', 'JSON', 'Firebase Security Rules', 'Node.js', 'PowerShell', 'Markdown'], live: 'https://byruby12.github.io/WebUniversal/', repo: 'https://github.com/ByRuby12/WebUniversal' },
-  pueblerinos: { kicker: '18 / Marketplace alimentario con IA', title: 'Pueblerinos.es', description: 'Portal digital de alimentación que conecta a usuarios con productos de proximidad y vendedores. Organiza el catálogo por categorías como carnes, pescado, frutas, verduras, huevos, lácteos y productos artesanos, e incorpora registro de usuarios, carrito y espacio para vendedores. Proyecto desarrollado con ayuda de inteligencia artificial.', tech: ['Desarrollo web', 'Inteligencia Artificial', 'Marketplace', 'eCommerce', 'Catálogo digital'], live: 'https://pueblerinos.es/', repo: 'https://pueblerinos.es/' }
+  pueblerinos: { kicker: '18 / Marketplace alimentario con IA', title: 'Pueblerinos.es', description: 'Portal digital de alimentación que conecta a usuarios con productos de proximidad y vendedores. Organiza el catálogo por categorías como carnes, pescado, frutas, verduras, huevos, lácteos y productos artesanos, e incorpora registro de usuarios, carrito y espacio para vendedores. Proyecto desarrollado con ayuda de inteligencia artificial.', tech: ['Desarrollo web', 'Inteligencia Artificial', 'Marketplace', 'eCommerce', 'Catálogo digital'], live: 'https://pueblerinos.es/', repo: '' }
 };
 
 const revealObserver = new IntersectionObserver((entries) => entries.forEach((entry) => {
@@ -53,7 +53,9 @@ const openModal = (key) => {
   document.querySelector('#modal-description').textContent = project.description;
   document.querySelector('#modal-tech').innerHTML = project.tech.map((item) => `<span>${item}</span>`).join('');
   document.querySelector('#modal-live').href = project.live;
-  document.querySelector('#modal-repo').href = project.repo;
+  const repoLink = document.querySelector('#modal-repo');
+  repoLink.href = project.repo || '#';
+  repoLink.hidden = !project.repo;
   modal.classList.add('open');
   modal.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
